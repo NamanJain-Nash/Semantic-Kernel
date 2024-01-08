@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/nashtech/work/SemanticKernel/Semantic_Kernel/Semantic_Kernel.csproj": {}
+    "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj": {}
   },
   "projects": {
-    "/home/nashtech/work/SemanticKernel/Semantic_Kernel/Semantic_Kernel.csproj": {
+    "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/nashtech/work/SemanticKernel/Semantic_Kernel/Semantic_Kernel.csproj",
+        "projectUniqueName": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj",
         "projectName": "Semantic_Kernel",
-        "projectPath": "/home/nashtech/work/SemanticKernel/Semantic_Kernel/Semantic_Kernel.csproj",
+        "projectPath": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj",
         "packagesPath": "/home/nashtech/.nuget/packages/",
-        "outputPath": "/home/nashtech/work/SemanticKernel/Semantic_Kernel/obj/",
+        "outputPath": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/nashtech/.nuget/NuGet/NuGet.Config"
