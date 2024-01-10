@@ -71,7 +71,10 @@ namespace Services.Service
                 if (ra != null) result.Append("\n " + ra.Metadata.Description + "\n");
                 if (ra2 != null) result.Append("\n " + ra2.Metadata.Id + ": " + ra2.Metadata.Description + "\n");
             }
-
+            if(result.ToString()== "The below is relevant information.\n[START INFO]")
+            {
+                return null;
+            }
             result.Append("\n[END INFO]");
             result.Append($"\n{query}");
 
