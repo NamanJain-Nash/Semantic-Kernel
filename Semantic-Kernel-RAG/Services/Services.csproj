@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Service/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlingFireNuget" Version="0.1.8" />
+    <PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.26.240104.1+16fddfa" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.26.240104.1+16fddfa" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.0.1" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.0.1" />
+  </ItemGroup>
+
 </Project>
