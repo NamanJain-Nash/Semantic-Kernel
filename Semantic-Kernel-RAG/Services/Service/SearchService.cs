@@ -12,7 +12,7 @@ using Microsoft.SemanticKernel.Connectors.Qdrant;
 
 namespace Services.Service
 {
-    public class SearchService:ISearchService
+    public class SearchService : ISearchService
     {
         private readonly IConfiguration _config;
         private readonly ILogger<LoadMemoryService> _logger;
@@ -24,11 +24,8 @@ namespace Services.Service
             _logger = logger;
             _kernel = kernel;
         }
-        public async Task<string> SearchMemoriesAsync(string query,string collenctionName)
+        public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {
-
-            StringBuilder result = new StringBuilder();
-            result.Append("The below is relevant information.\n[START INFO]");
             //building the search engine for the store
 #pragma warning disable SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             HuggingFaceTextEmbeddingGenerationService embeddingService = new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5", "http://0.0.0.0:8080");
@@ -48,12 +45,17 @@ namespace Services.Service
                 memoryStore,
                 embeddingService);
 #pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
+            return await SearchInVectorAsync(textMemory, query, collenctionName);
+        }
+        private async Task<string> SearchInVectorAsync(SemanticTextMemory textMemory, string query, string collenctionName)
+        {
 #pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             IAsyncEnumerable<MemoryQueryResult> queryResults =
-                textMemory.SearchAsync(collenctionName, query, limit: 5, minRelevanceScore: 0.77);
+    textMemory.SearchAsync(collenctionName, query, limit: 5, minRelevanceScore: 0.77);
 #pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
+            StringBuilder result = new StringBuilder();
+            result.Append("The below is relevant information.\n[START INFO]");
             // For each memory found, get previous and next memories.
             await foreach (MemoryQueryResult r in queryResults)
             {
@@ -73,7 +75,7 @@ namespace Services.Service
             result.Append("\n[END INFO]");
             result.Append($"\n{query}");
 
-            _logger.LogInformation($"The Search for {query} Result is : \n"+result.ToString());
+            _logger.LogInformation($"The Search for {query} Result is : \n" + result.ToString());
             return result.ToString();
         }
 
