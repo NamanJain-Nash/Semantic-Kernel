@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  ragembedding:
+    container_name: HuggingFaceEmbedding
+    build:
+      context: .
+      dockerfile: embeddingmodel.Dockerfile
+    ports:
+      - 8080:8080
+    restart: always
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:latest
+    ports:
+      - 6500:6333
+    volumes:
+      - ./Qdrant:/qdrant/storage
+  chatapi:
+    container_name: RagChatAPI
+    build:
+      context: ./ChatAPI
+      dockerfile: Dockerfile
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Production"  
+    ports:
+      - 8080:80
+    depends_on:
+      - qdrant
+      - ragembedding
+    restart: always
+
+
+#  nginx:
+#    container_name: nginx
+#    image: nginx:stable-alpine
+#    volumes:
+#      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro #/etc/nginx/nginx.conf
+#      - ./nginx/ssl:/etc/nginx/ssl  # Mount the directory containing your SSL file
+#    ports:
+#      - 443:443
+#    restart: always   
+#    depends_on:
+#      - hindalcobot
