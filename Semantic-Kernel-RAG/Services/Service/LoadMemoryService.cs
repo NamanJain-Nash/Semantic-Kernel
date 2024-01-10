@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.Quadrant;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Microsoft.SemanticKernel.Connectors.HuggingFace;
 namespace Services;
 
 public class LoadMemoryService:ILoadMemoryService
@@ -23,45 +24,23 @@ public class LoadMemoryService:ILoadMemoryService
             _logger.LogError("No text files provided. Use '--help' for usage.");
             return "No File Found";
         }
-        IKernel kernel;
-        // Get the OpenAI API key from the configuration.
-        string openAiApiKey = _config["OPENAI_APIKEY"]??"";
-        string memoryString=_config["Quadrant:memory"]??"";
-        if (string.IsNullOrWhiteSpace(openAiApiKey) || string.IsNullOrWhiteSpace(memoryString))
+#pragma warning disable SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        HuggingFaceTextEmbeddingGenerationService embeddiingService=new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5","http://0.0.0.0:8080");
+#pragma warning restore SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        string memoryStringConnection=_config["Quadrant:memory"]??"";
+        if (string.IsNullOrWhiteSpace(memoryStringConnection))
         {
-        _logger.LogError("Please set the 'OPENAI_APIKEY' user secret with your OpenAI API key.");
+        _logger.LogError("Please set the connection string of the memory");
             return "Keys not Found";
         }
-        // Create a new memory store that will store the embeddings in Qdrant.
-        Uri qdrantUri = new Uri(_config["Quadrant:Uri"]);
-        QdrantMemoryStore memoryStore = new QdrantMemoryStore(
-            host: $"{qdrantUri.Scheme}://{qdrantUri.Host}",
-            port: qdrantUri.Port,
-            vectorSize: 1536);
+#pragma warning disable SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        var memoryStore = new QdrantMemoryStore(memoryStringConnection, 1536);
+#pragma warning restore SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-//             kernel = sk.Kernel()
-
-// # Configure LLM service
-// kernel.config.add_text_completion_service(
-//     "gpt2", sk_hf.HuggingFaceTextCompletion("gpt2", task="text-generation")
-// )
-// kernel.config.add_text_embedding_generation_service(
-//     "sentence-transformers/all-MiniLM-L6-v2",
-//     sk_hf.HuggingFaceTextEmbedding("sentence-transformers/all-MiniLM-L6-v2"),
-// )
-// kernel.register_memory_store(memory_store=sk.memory.VolatileMemoryStore())
-// kernel.import_skill(sk.core_skills.TextMemorySkill())
-        // Create a new kernel with an OpenAI Embedding Generation service.
-        kernel = new KernelBuilder()
-            .Configure(c => c.AddOpenAITextEmbeddingGenerationService(
-                modelId: "text-embedding-ada-002",
-                apiKey: openAiApiKey))
-            .WithMemoryStorage(memoryStore)
-            .Build();
-        await ImportMemoriesAsync(kernel, collection, textFile);
+        await ImportMemoriesAsync(embeddiingService, collection, textFile);
         return "Import Done";
     }
-    private async Task ImportMemoriesAsync(IKernel kernel, string collection, params FileInfo[] textFile)
+    private async Task ImportMemoriesAsync(dynamic kernel, string collection, params FileInfo[] textFile)
     {
         // Use sequential memory IDs; this makes it easier to retrieve sentences near a given sentence.
         int memoryId = 0;
@@ -72,10 +51,8 @@ public class LoadMemoryService:ILoadMemoryService
         {
             // Read the text file.
             string text = File.ReadAllText(fileInfo.FullName);
-
             // Split the text into sentences.
             string[] sentences = BlingFireUtils.GetSentences(text).ToArray();
-
             // Save each sentence to the memory store.
             int sentenceCount = 0;
             foreach (string sentence in sentences)
