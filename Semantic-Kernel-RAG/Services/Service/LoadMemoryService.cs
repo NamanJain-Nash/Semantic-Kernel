@@ -24,6 +24,9 @@ public class LoadMemoryService:ILoadMemoryService
             _logger.LogError("No text files provided. Use '--help' for usage.");
             return "No File Found";
         }
+
+
+
 #pragma warning disable SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         HuggingFaceTextEmbeddingGenerationService embeddiingService=new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5","http://0.0.0.0:8080");
 #pragma warning restore SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

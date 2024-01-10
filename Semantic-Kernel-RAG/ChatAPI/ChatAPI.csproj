@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.26.240104.1+16fddfa" />
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.0.1" />

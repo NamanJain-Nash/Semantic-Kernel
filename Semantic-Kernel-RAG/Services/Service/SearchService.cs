@@ -7,6 +7,8 @@ using System.Text;
 using Services.IService;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
+using Microsoft.SemanticKernel.Connectors.HuggingFace;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
 
 namespace Services.Service
 {
@@ -27,18 +29,39 @@ namespace Services.Service
 
             StringBuilder result = new StringBuilder();
             result.Append("The below is relevant information.\n[START INFO]");
+            //building the search engine for the store
+#pragma warning disable SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            HuggingFaceTextEmbeddingGenerationService embeddingService = new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5", "http://0.0.0.0:8080");
+#pragma warning restore SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            string memoryStringConnection = _config["Quadrant:memory"] ?? "";
+            if (string.IsNullOrWhiteSpace(memoryStringConnection))
+            {
+                _logger.LogError("Please set the connection string of the memory");
+                return "Keys not Found";
+            }
+#pragma warning disable SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            var memoryStore = new QdrantMemoryStore(memoryStringConnection, 1536);
+#pragma warning restore SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
+#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            SemanticTextMemory textMemory = new(
+                memoryStore,
+                embeddingService);
+#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             IAsyncEnumerable<MemoryQueryResult> queryResults =
-                _kernel.Memory.SearchAsync(collenctionName, query, limit: 5, minRelevanceScore: 0.77);
+                textMemory.SearchAsync(collenctionName, query, limit: 5, minRelevanceScore: 0.77);
+#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
             // For each memory found, get previous and next memories.
             await foreach (MemoryQueryResult r in queryResults)
             {
                 int id = int.Parse(r.Metadata.Id);
-                MemoryQueryResult? rb2 = await _kernel.Memory.GetAsync(memoryCollectionName, (id - 2).ToString());
-                MemoryQueryResult? rb = await _kernel.Memory.GetAsync(memoryCollectionName, (id - 1).ToString());
-                MemoryQueryResult? ra = await _kernel.Memory.GetAsync(memoryCollectionName, (id + 1).ToString());
-                MemoryQueryResult? ra2 = await _kernel.Memory.GetAsync(memoryCollectionName, (id + 2).ToString());
+                MemoryQueryResult? rb2 = await textMemory.GetAsync(collenctionName, (id - 2).ToString());
+                MemoryQueryResult? rb = await textMemory.GetAsync(collenctionName, (id - 1).ToString());
+                MemoryQueryResult? ra = await textMemory.GetAsync(collenctionName, (id + 1).ToString());
+                MemoryQueryResult? ra2 = await textMemory.GetAsync(collenctionName, (id + 2).ToString());
 
                 if (rb2 != null) result.Append("\n " + rb2.Metadata.Id + ": " + rb2.Metadata.Description + "\n");
                 if (rb != null) result.Append("\n " + rb.Metadata.Description + "\n");
@@ -50,7 +73,7 @@ namespace Services.Service
             result.Append("\n[END INFO]");
             result.Append($"\n{query}");
 
-            _logger.LogInfo($"The Search for {query} Result is : \n"+result.ToString());
+            _logger.LogInformation($"The Search for {query} Result is : \n"+result.ToString());
             return result.ToString();
         }
 
