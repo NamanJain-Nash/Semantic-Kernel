@@ -3,7 +3,7 @@ using Services.IService;
 
 namespace Buisness_Logic;
 
-public class ChatLogic
+public class ChatLogic:IChatLogic
 {
     private readonly ISearchService _searchService;
     private readonly IChatService _chatService;
