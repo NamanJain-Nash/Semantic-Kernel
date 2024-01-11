@@ -18,11 +18,10 @@ namespace Services.Service
         private readonly ILogger<LoadMemoryService> _logger;
         private readonly IKernelBuilder _kernel;
 
-        public SearchService(IConfiguration config, ILogger<LoadMemoryService> logger, IKernelBuilder kernel)
+        public SearchService(IConfiguration config, ILogger<LoadMemoryService> logger)
         {
             _config = config;
             _logger = logger;
-            _kernel = kernel;
         }
         public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {

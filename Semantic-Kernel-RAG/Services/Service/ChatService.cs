@@ -22,11 +22,10 @@ namespace Services.Service
         private string ChatTemplate = @"You are a chatting system that try to solve the query mentioned in a proffesional way and be precise in nature
 ```Query:{{$input}}```";
 
-        public ChatService(IConfiguration config, ILogger<ChatService> logger, IKernelBuilder kernel)
+        public ChatService(IConfiguration config, ILogger<ChatService> logger)
         {
             _config = config;
             _logger = logger;
-            _kernel = kernel;
         }
         //To be implmented
         public async Task<string> ChattingWithLLM(string query)
