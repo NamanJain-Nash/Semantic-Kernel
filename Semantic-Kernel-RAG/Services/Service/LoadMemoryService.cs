@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Microsoft.SemanticKernel.Connectors.HuggingFace;
 using Microsoft.SemanticKernel.Memory;
+using Microsoft.KernelMemory;
 using Azure.Core;
 namespace Services;
 
@@ -75,6 +76,11 @@ public class LoadMemoryService : ILoadMemoryService
 
     }
     }
+    //public async Task<string> testKernelMmeory() {
+    //    HuggingFaceTextEmbeddingGenerationService embeddiingService = new HuggingFaceTextEmbeddingGenerationService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
+    //    var memory = new KernelMemoryBuilder().WithCustomEmbeddingGenerator(embeddiingService).WithQdrantMemoryDb("").Build<MemoryServerless>(); ;
+    //    memory.ImportDocumentAsync();
 
+    //    return ""; }
 
 }
