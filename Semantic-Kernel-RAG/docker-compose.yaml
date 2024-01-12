@@ -2,11 +2,16 @@ version: "3.8"
 services:
   ragembedding:
     container_name: HuggingFaceEmbedding
-    build:
-      context: .
-      dockerfile: embeddingmodel.Dockerfile
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-0.6
     ports:
-      - 8080:8080
+      - "8080:80"
+    volumes:
+      - ./data:/data
+    command:
+      - --model-id
+      - BAAI/bge-large-en-v1.5
+      - --revision
+      - refs/pr/5
     restart: always
   qdrant:
     container_name: qdrant
@@ -15,21 +20,6 @@ services:
       - 6500:6333
     volumes:
       - ./Qdrant:/qdrant/storage
-  chatapi:
-    container_name: RagChatAPI
-    build:
-      context: ./ChatAPI
-      dockerfile: Dockerfile
-    environment:
-      - "ASPNETCORE_ENVIRONMENT=Production"  
-    ports:
-      - 8080:80
-    depends_on:
-      - qdrant
-      - ragembedding
-    restart: always
-
-
 #  nginx:
 #    container_name: nginx
 #    image: nginx:stable-alpine

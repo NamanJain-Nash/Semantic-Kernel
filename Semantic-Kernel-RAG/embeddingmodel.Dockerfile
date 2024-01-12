@@ -8,9 +8,6 @@ RUN apt-get update && \
 # Create a directory for your application
 WORKDIR /app
 
-# Copy the router code into the container
-COPY router /app/router
-
 # Build the router code
 RUN cargo install --path /app/router -F candle -F mkl
 

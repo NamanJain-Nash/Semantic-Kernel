@@ -7,3 +7,10 @@
 ## Deployment
 
 <p>All the process used will be taking use of Ollama in case of </p>
+
+
+model=BAAI/bge-large-en-v1.5
+revision=refs/pr/5
+volume=$PWD/data
+
+docker run -p 8080:80 -v $volume:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-0.6 --model-id $model --revision $revision
