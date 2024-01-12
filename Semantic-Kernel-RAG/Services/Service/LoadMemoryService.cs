@@ -37,6 +37,9 @@ public class LoadMemoryService : ILoadMemoryService
         int vectorSize = int.Parse(_config["Quadrant:vectorSize"] ?? "0");
         var memoryStore = new QdrantMemoryStore(memoryStringConnection, vectorSize);
         //Store Kernel
+        List<string> test=new List<string>();
+        test.Add("test");
+        var k=await embeddiingService.GenerateEmbeddingsAsync(test);
         textMemory = new (memoryStore,embeddiingService);
         await ImportMemoriesAsync(textMemory, collection, textFile);
 
