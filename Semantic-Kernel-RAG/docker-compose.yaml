@@ -7,7 +7,6 @@ services:
       - "11434:11434"
     volumes:
       - ./ollama:/root/.ollama
-    command: ["ollama","run","tinyllama"]
   ragembedding:
     container_name: HuggingFaceEmbedding
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-0.6
