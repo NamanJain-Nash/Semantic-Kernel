@@ -397,3 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Semantic-Kernel-RAG/data
+Semantic-Kernel-RAG/ollama
+Semantic-Kernel-RAG/ChatApi/uploads
+Semantic-Kernel-RAG/ChatApi/uploadsTemp
