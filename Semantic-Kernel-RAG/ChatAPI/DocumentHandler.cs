@@ -1,4 +1,5 @@
 ﻿using Buisness_Logic;
+using Microsoft.AspNetCore.Mvc;
 namespace ChatAPI
 {
     public class DocumentHandler
@@ -7,11 +8,14 @@ namespace ChatAPI
         public DocumentHandler(IDocumentLogic documentLogic) {
                 _documentHandler = documentLogic;
         }
-        public async Task<string> DocumentToRag(IFormFileCollection files)
+        public async Task<string> DocumentToRag(IFormFileCollection files,[FromBody]string collection)
         {
             if (files == null || files.Count == 0)
                 return ("No files uploaded.");
-
+            if (collection == "")
+            {
+                return "Please provide a valid collection name";
+            }
             var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
 
             var uploadsFolder = Path.Combine("", "uploads");
@@ -38,7 +42,7 @@ namespace ChatAPI
             }
 
             //Sending to Buisness Logic
-            if (await _documentHandler.DocumentToEmbedding(fileInfoArray.ToArray()))
+            if (await _documentHandler.DocumentToEmbedding(collection,fileInfoArray.ToArray()))
             {
                 return "Your Files have been Embedded";
             }

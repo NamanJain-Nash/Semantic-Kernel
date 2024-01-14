@@ -19,7 +19,7 @@ namespace Buisness_Logic
         {
             _loadMemoryService = loadMemoryService;
         }
-        public async Task<bool> DocumentToEmbedding(params FileInfo[] textFile) {
+        public async Task<bool> DocumentToEmbedding(string collection, params FileInfo[] textFile) {
             try {
                 //Convert to Type
                 var convertedFiles = new List<FileInfo>();
@@ -49,7 +49,7 @@ namespace Buisness_Logic
                         return false; // Unsupported file type
                     }
                 }
-                string result =await _loadMemoryService.ImportFile("test", convertedFiles.ToArray());
+                string result =await _loadMemoryService.ImportFile(collection, convertedFiles.ToArray());
 
                 if (result == "Import Done")
                 {

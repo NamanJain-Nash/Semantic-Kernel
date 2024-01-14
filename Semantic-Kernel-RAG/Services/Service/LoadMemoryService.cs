@@ -48,8 +48,9 @@ public class LoadMemoryService : ILoadMemoryService
             _logger.LogError("Please set the connection string of the memory");
             return "Keys not Found";
         }
-        int vectorSize = int.Parse(_config["Quadrant:vectorSize"] ?? "0");
-        var memoryStore = new QdrantMemoryStore(memoryStringConnection, vectorSize);
+        int vectorSize = int.Parse(_config["Quadrant:vectorSize"] ?? "1024");
+        var memoryStore = new QdrantMemoryStore("http://semantickbot.centralindia.cloudapp.azure.com:6333", vectorSize);
+        //Savety to make the Collection
         try
         {
             await memoryStore.CreateCollectionAsync(collection);

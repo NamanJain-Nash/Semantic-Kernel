@@ -19,12 +19,14 @@ namespace Services.Service
         private readonly IConfiguration _config;
         private readonly ILogger<ChatService> _logger;
         private readonly IKernelBuilder _kernel;
+        public readonly string _apiUrl;
         private string ChatTemplate = @"You are a chatting system that try to solve the query mentioned in a proffesional way and be precise in nature
 ```Query:{{$input}}```";
 
         public ChatService(IConfiguration config, ILogger<ChatService> logger)
         {
             _config = config;
+            _apiUrl = _config["LLM:endpoint"] ??"";
             _logger = logger;
         }
         //To be implmented
@@ -33,9 +35,9 @@ namespace Services.Service
             //Intitalizing The Kernel
             IKernelBuilder builder = Kernel.CreateBuilder();
             // Add your text generation service as a singleton instance of the Kernel
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new MyTextGenerationService());
+            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new MyTextGenerationService(_apiUrl));
             // Add your text generation service as a factory method
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new MyTextGenerationService());
+            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new MyTextGenerationService(_apiUrl));
             //Build the Kernel
             Kernel kernel = builder.Build();
             //Function Defined
@@ -48,6 +50,14 @@ namespace Services.Service
         }
         private sealed class MyTextGenerationService : ITextGenerationService
         {
+            private readonly string _apiUrl;
+
+            // Constructor to receive the API URL
+            public MyTextGenerationService(string apiUrl)
+            {
+                _apiUrl = apiUrl;
+            }
+
             public IReadOnlyDictionary<string, object?> Attributes => new Dictionary<string, object?>();
             public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(string prompt, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
             {
@@ -66,7 +76,7 @@ namespace Services.Service
                 string LLMResultText;
 
                 // The API URL of Custom/Local LLM
-                string apiUrl = "http://localhost:1234/v1/chat/completions";
+                string apiUrl = _apiUrl;
                 // Define the JSON payload
                 string jsonPayload = @$"
             {{
@@ -114,7 +124,5 @@ namespace Services.Service
             };
             }
         }
-
-
     }
 }

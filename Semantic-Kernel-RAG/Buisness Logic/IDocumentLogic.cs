@@ -8,6 +8,6 @@ namespace Buisness_Logic
 {
     public interface IDocumentLogic
     {
-        public Task<bool> DocumentToEmbedding(params FileInfo[] textFile);
+        public Task<bool> DocumentToEmbedding(string collection,params FileInfo[] textFile);
         }
 }

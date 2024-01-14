@@ -26,33 +26,26 @@ namespace Services.Service
         public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {
             //building the search engine for the store
-#pragma warning disable SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             HuggingFaceTextEmbeddingGenerationService embeddingService = new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5", "http://0.0.0.0:8080");
-#pragma warning restore SKEXP0020 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             string memoryStringConnection = _config["Quadrant:memory"] ?? "";
+            int VectorSize = int.Parse(_config["Quadrant:vectorSize"]??"1024");
             if (string.IsNullOrWhiteSpace(memoryStringConnection))
             {
                 _logger.LogError("Please set the connection string of the memory");
                 return "Keys not Found";
             }
-#pragma warning disable SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-            var memoryStore = new QdrantMemoryStore(memoryStringConnection, 1536);
-#pragma warning restore SKEXP0026 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
-#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            var memoryStore = new QdrantMemoryStore(memoryStringConnection, VectorSize);
             SemanticTextMemory textMemory = new(
                 memoryStore,
                 embeddingService);
-#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             return await SearchInVectorAsync(textMemory, query, collenctionName);
         }
         private async Task<string> SearchInVectorAsync(SemanticTextMemory textMemory, string query, string collenctionName)
         {
-#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            int searchLimit = int.Parse(_config["Search:Limit"]??"5");
+            double MinRelevace = double.Parse(_config["Search:Relevance"]??"0.77");
             IAsyncEnumerable<MemoryQueryResult> queryResults =
-    textMemory.SearchAsync(collenctionName, query, limit: 5, minRelevanceScore: 0.77);
-#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
+            textMemory.SearchAsync(collenctionName, query, limit: searchLimit, minRelevanceScore: MinRelevace);
             StringBuilder result = new StringBuilder();
             result.Append("The below is relevant information.\n[START INFO]");
             // For each memory found, get previous and next memories.

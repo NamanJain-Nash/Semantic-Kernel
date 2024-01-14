@@ -24,7 +24,7 @@ services:
     container_name: qdrant
     image: qdrant/qdrant:latest
     ports:
-      - 6500:6333
+      - 6333:6333
     volumes:
       - ./Qdrant:/qdrant/storage
 #  nginx:
