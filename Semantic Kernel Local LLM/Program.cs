@@ -32,8 +32,12 @@ class Program
         const string Input = "What is the Capital of France";
         Console.WriteLine($"Function input: {Input}\n");
         //Run the Prompt
+        try{
         var result =  await paragraphWritingFunction.InvokeAsync(kernel, new() { ["input"] = Input });
-        Console.WriteLine(result);
+        Console.WriteLine(result);}
+        catch(Exception e){
+            Console.WriteLine(e.Message);}
+        
     }
     private sealed class MyTextGenerationService : ITextGenerationService
     {
