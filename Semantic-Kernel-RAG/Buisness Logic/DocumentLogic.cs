@@ -98,7 +98,7 @@ namespace Buisness_Logic
             {
                 return null;
             }
-            var uploadsFolder = Path.Combine("", "uploadsTemp");
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploadsTemp");
             Directory.CreateDirectory(uploadsFolder);
             // Specify the file path
             string filePath = Path.Combine(uploadsFolder, (inputFile.Name.Replace(".pdf", "").Replace(".docx", "")+".txt"));

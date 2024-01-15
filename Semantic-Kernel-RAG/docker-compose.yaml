@@ -27,7 +27,7 @@ services:
       - 6333:6333
     volumes:
       - ./Qdrant:/qdrant/storage
-  ChatApi:
+  chatapi:
     container_name: dotnetapi
     build:
       context: .
@@ -36,6 +36,7 @@ services:
       - "ASPNETCORE_ENVIRONMENT=Production"  
     ports:
       - 8000:80
+      - 3255:8080
     depends_on:
       - qdrant
     restart: always

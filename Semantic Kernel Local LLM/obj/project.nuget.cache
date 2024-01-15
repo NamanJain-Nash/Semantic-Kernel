@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "G08n8VJA5eRfoHZCMNe+EEpdHUkYDFKXvlmnX+jOBPiBH+YMYmj80AQKNpPDJ0hJqcRL7lgmxwRwDCWRbX986g==",
+  "dgSpecHash": "/1DoR8zZbVZMJSzPsJ8SZDSdpJIcalblFsBcI6FzykxShkZvntVxW6nm83hMDQ0syzNHUjFx1BsJ3VuQIYKjrg==",
   "success": true,
-  "projectFilePath": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj",
+  "projectFilePath": "/home/nashtech/work/Semantic-Kernel/Semantic Kernel Local LLM/Semantic_Kernel.csproj",
   "expectedPackageFiles": [
     "/home/nashtech/.nuget/packages/azure.ai.openai/1.0.0-beta.12/azure.ai.openai.1.0.0-beta.12.nupkg.sha512",
     "/home/nashtech/.nuget/packages/azure.core/1.36.0/azure.core.1.36.0.nupkg.sha512",

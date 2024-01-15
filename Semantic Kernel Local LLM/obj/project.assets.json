@@ -1066,11 +1066,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj",
+      "projectUniqueName": "/home/nashtech/work/Semantic-Kernel/Semantic Kernel Local LLM/Semantic_Kernel.csproj",
       "projectName": "Semantic_Kernel",
-      "projectPath": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/Semantic_Kernel.csproj",
+      "projectPath": "/home/nashtech/work/Semantic-Kernel/Semantic Kernel Local LLM/Semantic_Kernel.csproj",
       "packagesPath": "/home/nashtech/.nuget/packages/",
-      "outputPath": "/home/nashtech/work/Semantic_Kernel/Semantic-Kernel/obj/",
+      "outputPath": "/home/nashtech/work/Semantic-Kernel/Semantic Kernel Local LLM/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/nashtech/.nuget/NuGet/NuGet.Config"
@@ -1122,7 +1122,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

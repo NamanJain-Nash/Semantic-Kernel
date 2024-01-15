@@ -9,7 +9,8 @@ namespace ChatAPI
                 _documentHandler = documentLogic;
         }
         public async Task<string> DocumentToRag(IFormFileCollection files,string collection)
-        {
+        {   
+            try{
             if (files == null || files.Count == 0)
                 return ("No files uploaded.");
             if (collection == "")
@@ -18,7 +19,7 @@ namespace ChatAPI
             }
             var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
 
-            var uploadsFolder = Path.Combine("", "uploads");
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
             Directory.CreateDirectory(uploadsFolder);
 
             var fileInfoArray = new List<FileInfo>();
@@ -47,6 +48,10 @@ namespace ChatAPI
                 return "Your Files have been Embedded";
             }
             return ("File is Failed");
-        }
+            }
+            catch(Exception e){
+                return e.Message;
+            }
+          }
     }
 }

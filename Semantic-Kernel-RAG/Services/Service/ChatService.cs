@@ -84,10 +84,10 @@ namespace Services.Service
                     {{ ""role"": ""user"", ""content"": ""{prompt}"" }}
                 ],
                 ""temperature"": 1,
-                ""max_tokens"": -1,
+                ""max_tokens"": 0,
                 ""stream"": false
             }}";
-
+            Console.WriteLine(jsonPayload);
                 // Create an HttpClient instance
                 using (HttpClient client = new HttpClient())
                 {

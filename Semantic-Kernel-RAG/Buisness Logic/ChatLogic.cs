@@ -1,4 +1,6 @@
-﻿using Models;
+﻿using System.Net.Http.Headers;
+using Models;
+using Services;
 using Services.IService;
 
 namespace Buisness_Logic;
@@ -18,7 +20,8 @@ public class ChatLogic:IChatLogic
         string chatQuery = chatInput.UserQuery;
         //Getting Query With Memory
         string ragSystemMemory = await _searchService.SearchMemoriesAsync(chatInput.UserQuery,chatInput.CollectionName);
-        if (ragSystemMemory != "") {
+        Console.WriteLine("test:"+ragSystemMemory);
+        if (ragSystemMemory != "" && ragSystemMemory!="Keys not Found") {
         chatQuery = $@"Question:{chatQuery}
 
 Context: {ragSystemMemory}
