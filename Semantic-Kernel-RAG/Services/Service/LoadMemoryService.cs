@@ -49,7 +49,7 @@ public class LoadMemoryService : ILoadMemoryService
             return "Keys not Found";
         }
         int vectorSize = int.Parse(_config["Quadrant:vectorSize"] ?? "1024");
-        var memoryStore = new QdrantMemoryStore("http://semantickbot.centralindia.cloudapp.azure.com:6333", vectorSize);
+        var memoryStore = new QdrantMemoryStore(memoryStringConnection, vectorSize);
         //Savety to make the Collection
         try
         {

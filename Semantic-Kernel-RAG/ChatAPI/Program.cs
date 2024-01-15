@@ -65,15 +65,14 @@ app.MapPost("/api/chat", async (ChatInput chatInput, ChatHandler chatHandler) =>
         return Results.BadRequest("Invalid input");
     }
 });
-app.MapPost("api/file", async (IFormFileCollection files,DocumentHandler handler) => {
+app.MapPost("api/file", async (IFormFileCollection files,string collection,DocumentHandler handler) => {
     if (files == null)
     {
         return Results.BadRequest("Invalid input");
     }
-
     try
     {
-        var result = await handler.DocumentToRag(files);
+        var result = await handler.DocumentToRag(files,collection);
         return TypedResults.Ok(result);
     }
     catch (Exception ex)

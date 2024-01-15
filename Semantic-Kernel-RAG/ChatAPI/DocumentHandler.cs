@@ -8,7 +8,7 @@ namespace ChatAPI
         public DocumentHandler(IDocumentLogic documentLogic) {
                 _documentHandler = documentLogic;
         }
-        public async Task<string> DocumentToRag(IFormFileCollection files,[FromBody]string collection)
+        public async Task<string> DocumentToRag(IFormFileCollection files,string collection)
         {
             if (files == null || files.Count == 0)
                 return ("No files uploaded.");
