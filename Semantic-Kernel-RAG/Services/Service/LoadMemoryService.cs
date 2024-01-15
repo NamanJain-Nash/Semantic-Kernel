@@ -87,7 +87,7 @@ public class LoadMemoryService : ILoadMemoryService
             // Split the text into sentences.
             // Split the text into sentences.
             string[] sentences = BlingFireUtils.GetSentences(text).ToArray();
-
+            int id_start = 100;
             // Save each sentence to the memory store.
             int sentenceCount = 0;
             foreach (string sentence in sentences)
@@ -101,7 +101,8 @@ public class LoadMemoryService : ILoadMemoryService
 
                 try
                 {
-                    string id = Guid.NewGuid().ToString();
+                    string id = id_start.ToString();
+                    id_start++;
                     var x = await kernel.SaveInformationAsync(collection, id: id, text: sentence);
                 }
                 catch (Exception e)

@@ -26,7 +26,7 @@ namespace Services.Service
         public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {
             //building the search engine for the store
-            HuggingFaceTextEmbeddingGenerationService embeddingService = new HuggingFaceTextEmbeddingGenerationService("BAAI/bge-large-en-v1.5", "http://0.0.0.0:8080");
+            testHuggingFace embeddingService = new testHuggingFace(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
             string memoryStringConnection = _config["Quadrant:memoryUrl"] ?? "";
             int VectorSize = int.Parse(_config["Quadrant:vectorSize"]??"1024");
             if (string.IsNullOrWhiteSpace(memoryStringConnection))
