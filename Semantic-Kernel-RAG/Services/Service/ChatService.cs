@@ -20,101 +20,58 @@ namespace Services.Service
         private readonly ILogger<ChatService> _logger;
         private readonly IKernelBuilder _kernel;
         public readonly string _apiUrl;
-        private string ChatTemplate = @"You are a chatting system that try to solve the query mentioned in a proffesional way and be precise in nature \r\n \r\n ```Query:{{$input}}```";
+        public readonly double _temprature;
+        public readonly int _maxtoken;
+        public readonly string _model;
+        private string ChatTemplate = @"You are a chatting system that try to solve the Query and Information mentioned in a proffesional way and be precise in nature \r\n \r\n ```Query:{{$query}}   
+        Information:{{$information}}```";
 
         public ChatService(IConfiguration config, ILogger<ChatService> logger)
         {
             _config = config;
-            _apiUrl = _config["LLM:endpoint"] ??"";
+            if (_config["LLMUsed"] == "LMStudio")
+            {
+                _apiUrl = _config["LLM_LMStudio:endpoint"] ?? "";
+                _maxtoken = int.Parse(_config["LLM_LMStudio:maxtoken"] ?? "-1");
+                _temprature = double.Parse(_config["LLM_LMStudio:temprature"] ?? "0.1");
+            }
+            if(_config["LLMUsed"] == "Ollama"){
+                _apiUrl = _config["LLM_Ollama:endpoint"] ?? "";
+                _maxtoken = int.Parse(_config["LLM_Ollama:maxtoken"] ?? "-1");
+                _temprature = double.Parse(_config["LLM_Ollama:temprature"] ?? "0.1");
+                _model=_config["LLM_Ollama:model"]??"tinyllama";
+            }
             _logger = logger;
         }
         //To be implmented
-        public async Task<string> ChattingWithLLM(string query)
+        public async Task<string> ChattingWithLLM(string query, string information)
         {
             //Intitalizing The Kernel
             IKernelBuilder builder = Kernel.CreateBuilder();
             // Add your text generation service as a singleton instance of the Kernel
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new MyTextGenerationService());
+            if (_config["LLMUsed"] == "LMStudio")
+            {
+                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new LMStudioTextGenerationService(_apiUrl, _maxtoken, _temprature));
             // Add your text generation service as a factory method
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new MyTextGenerationService());
+            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new LMStudioTextGenerationService(_apiUrl, _maxtoken, _temprature));
+            }
+            if(_config["LLMUsed"] == "Ollama"){
+                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature,_model));
+            // Add your text generation service as a factory method
+            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature,_model));
+            }
+            
+            
             //Build the Kernel
             Kernel kernel = builder.Build();
             //Function Defined
             var chatFunction = kernel.CreateFunctionFromPrompt(ChatTemplate);
             _logger.LogInformation($"Function input: {query}\n");
             //Run the Prompt
-            var result = await chatFunction.InvokeAsync(kernel, new() { ["input"] = query });
+            var result = await chatFunction.InvokeAsync(kernel, new() { ["query"] = query, ["information"] = information });
             return result.ToString();
 
         }
-           private sealed class MyTextGenerationService : ITextGenerationService
-    {
-        public IReadOnlyDictionary<string, object?> Attributes => new Dictionary<string, object?>();
-        public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(string prompt, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        {
-            string LLMResultText="Not implemented";
-            foreach (string word in LLMResultText.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            {
-                await Task.Delay(50, cancellationToken);
-                cancellationToken.ThrowIfCancellationRequested();
-
-                yield return new StreamingTextContent($"{word} ");
-            }
-        }
-        public async Task<IReadOnlyList<TextContent>> GetTextContentsAsync(string prompt, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, CancellationToken cancellationToken = default)
-        {
-            // Doing the HTTP call to the Local LLM Server
-            string LLMResultText;
-
-            // The API URL of Custom/Local LLM
-            string apiUrl = "http://localhost:1234/v1/chat/completions";
-            // Define the JSON payload
-            string jsonPayload = @$"
-            {{
-                ""messages"": [
-                    {{ ""role"": ""user"", ""content"": ""{prompt}"" }}
-                ],
-                ""temperature"": 1,
-                ""max_tokens"": -1,
-                ""stream"": false
-            }}";
-            Console.WriteLine(jsonPayload);
-            // Create an HttpClient instance
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    // Create HttpRequestMessage and set the Content-Type header
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
-                    request.Content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
-
-                    // Send the request
-                    HttpResponseMessage response = await client.SendAsync(request, cancellationToken);
-
-                    // Check if the request was successful (status code 200-299)
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        dynamic responseObject = JsonConvert.DeserializeObject(responseBody);
-                        LLMResultText = responseObject.choices[0].message.content;;
-                    }
-                    else
-                    {
-                        LLMResultText = "Failed to make the request. Status code: " + response.StatusCode;
-                    }
-                }
-                catch (HttpRequestException e)
-                {
-                    LLMResultText = "Error: " + e.Message;
-                }
-            }
-
-            return new List<TextContent>
-            {
-                new TextContent(LLMResultText)
-            };
-        }
     }
 
-        }
 }

@@ -42,37 +42,46 @@ namespace Services.Service
         }
         private async Task<string> SearchInVectorAsync(SemanticTextMemory textMemory, string query, string collenctionName)
         {
+            //Initialize the Search engine with Parameters
             int searchLimit = int.Parse(_config["Search:Limit"]??"5");
             double MinRelevace = double.Parse(_config["Search:Relevance"]??"0.77");
             IAsyncEnumerable<MemoryQueryResult> queryResults =
             textMemory.SearchAsync(collenctionName, query, limit: searchLimit, minRelevanceScore: MinRelevace);
+            
+            //Building The Searched Result with Releveant Info.
             StringBuilder result = new StringBuilder();
-            result.Append("The below is relevant information.\n[START INFO]");
+            result.Append("[START INFO] \n ");
+            StringBuilder SummarizeText=new StringBuilder();
             // For each memory found, get previous and next memories.
             await foreach (MemoryQueryResult r in queryResults)
             {
+                StringBuilder paraText=new StringBuilder();
                 int id = int.Parse(r.Metadata.Id);
                 MemoryQueryResult? rb2 = await textMemory.GetAsync(collenctionName, (id - 2).ToString());
                 MemoryQueryResult? rb = await textMemory.GetAsync(collenctionName, (id - 1).ToString());
                 MemoryQueryResult? ra = await textMemory.GetAsync(collenctionName, (id + 1).ToString());
                 MemoryQueryResult? ra2 = await textMemory.GetAsync(collenctionName, (id + 2).ToString());
 
-                if (rb2 != null) result.Append("\n " + rb2.Metadata.Id + ": " + rb2.Metadata.Description + "\n");
-                if (rb != null) result.Append("\n " + rb.Metadata.Description + "\n");
-                if (r != null) result.Append("\n " + r.Metadata.Description + "\n");
-                if (ra != null) result.Append("\n " + ra.Metadata.Description + "\n");
-                if (ra2 != null) result.Append("\n " + ra2.Metadata.Id + ": " + ra2.Metadata.Description + "\n");
+                if (rb2 != null) paraText.Append("\n " + rb2.Metadata.Text + "\t");
+                if (rb != null) paraText.Append(rb.Metadata.Text + "\t");
+                if (r != null) paraText.Append(r.Metadata.Text + "\t");
+                if (ra != null) paraText.Append(ra.Metadata.Text + "\t");
+                if (ra2 != null) paraText.Append(ra2.Metadata.Text + "\t");
+                SummarizeText.Append(paraText+"\n");
             }
-            if(result.ToString()== "The below is relevant information.\n[START INFO]")
+            //We have to Shorterner Up the Text to fit to the model too if the Text Length is Falling
+            result.Append(SummarizeText);
+            if(result.ToString()=="[START INFO] \n ")
             {
-                return null;
+                return "";
             }
             result.Append("\n[END INFO]");
-            result.Append($"\n{query}");
 
             _logger.LogInformation($"The Search for {query} Result is : \n" + result.ToString());
             return result.ToString();
         }
-
+        private async Task<string> SummarizeParagraphText(StringBuilder builder){
+            return "";
+        }
     }
 }

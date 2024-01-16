@@ -7,6 +7,7 @@ services:
       - "3000:11434"
     volumes:
       - ./ollama:/root/.ollama
+    restart: always
   ragembedding:
     container_name: HuggingFaceEmbedding
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-0.6
@@ -39,8 +40,10 @@ services:
       - 3255:8080
     depends_on:
       - qdrant
+      - ragembedding
+      - ollama
     restart: always
-
+#Move Toward a Public API only format
 #  nginx:
 #    container_name: nginx
 #    image: nginx:stable-alpine
