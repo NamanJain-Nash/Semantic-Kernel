@@ -1,5 +1,5 @@
 ﻿using Buisness_Logic;
-using Models;
+using Models.Chat;
 
 namespace ChatAPI;
 

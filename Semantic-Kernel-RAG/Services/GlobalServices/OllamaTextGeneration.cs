@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.TextGeneration;
+using Models.LLM;
 using Newtonsoft.Json;
 
 namespace Services;
@@ -36,7 +37,7 @@ public class OllamaTextGeneration : ITextGenerationService
         string LLMResultText;
 
         // Create an instance of the ChatRequest class
-        var chatRequest = new GenerateRequest
+        var chatRequest = new GennerateOllamaRequest
         {
             model = _model,
             temperature = _temprature,
@@ -84,11 +85,3 @@ public class OllamaTextGeneration : ITextGenerationService
     }
 }
 
-public class GenerateRequest
-{
-    public string model { get; set; }
-    public double temperature { get; set; }
-    public int num_predict { get; set; }
-    public string prompt { get; set; }
-    public bool stream { get; set; }
-}

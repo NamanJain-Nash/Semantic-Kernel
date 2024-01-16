@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Headers;
-using Models;
+using Models.Chat;
 using Services;
 using Services.IService;
 
@@ -20,10 +20,14 @@ public class ChatLogic:IChatLogic
         string chatQuery = chatInput.UserQuery;
         //Getting Query With Memory
         string ragSystemMemory = await _searchService.SearchMemoriesAsync(chatInput.UserQuery,chatInput.CollectionName);
+        Console.WriteLine("test:"+ragSystemMemory);
         if (ragSystemMemory != "" && ragSystemMemory!="Keys not Found") {
-        ragSystemMemory="Use Genral Information only"; 
+        chatQuery = $@"Question:{chatQuery}
+
+Context: {ragSystemMemory}
+";       
         }
-        result.AiAnswer = await _chatService.ChattingWithLLM(chatQuery,ragSystemMemory);
+        result.AiAnswer = await _chatService.ChattingWithLLM(chatQuery);
         return result;
 
     }

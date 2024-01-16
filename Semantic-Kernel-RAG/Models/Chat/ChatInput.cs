@@ -1,4 +1,4 @@
-﻿namespace Models;
+﻿namespace Models.Chat;
 
 public class ChatInput
 {

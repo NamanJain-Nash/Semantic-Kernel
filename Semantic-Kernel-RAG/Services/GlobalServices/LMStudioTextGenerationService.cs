@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.TextGeneration;
+using Models.LLM;
 using Newtonsoft.Json;
 
 namespace Services;
@@ -34,9 +35,9 @@ public sealed class LMStudioTextGenerationService : ITextGenerationService
     string LLMResultText;
 
     // Create an instance of the ChatRequest class
-    var chatRequest = new ChatRequest
+    var chatRequest = new LMStudioChatRequest
     {
-        messages = new List<Message> { new Message { role = "user", content = prompt } },
+        messages = new List<LMStudioMessage> { new LMStudioMessage { role = "user", content = prompt } },
         temperature = _temprature,
         max_tokens = _maxtoken,
         stream = false
@@ -85,16 +86,6 @@ public sealed class LMStudioTextGenerationService : ITextGenerationService
 
         
             }
-public class ChatRequest
-{
-    public List<Message> messages { get; set; }
-    public double temperature { get; set; }
-    public int max_tokens { get; set; }
-    public bool stream { get; set; }
-}
 
-public class Message
-{
-    public string role { get; set; }
-    public string content { get; set; }
-}
+
+

@@ -4,7 +4,7 @@ using ChatAPI;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using Models.Chat;
 using Services;
 using Services.IService;
 using Services.Service;

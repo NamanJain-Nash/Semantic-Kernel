@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using Models.Chat;
 
 namespace Buisness_Logic;
 
