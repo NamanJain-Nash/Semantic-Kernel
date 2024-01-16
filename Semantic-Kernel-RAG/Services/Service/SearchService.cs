@@ -27,8 +27,8 @@ namespace Services.Service
         {
             //building the search engine for the store
             testHuggingFace embeddingService = new testHuggingFace(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
-            string memoryStringConnection = _config["Quadrant:memoryUrl"] ?? "";
-            int VectorSize = int.Parse(_config["Quadrant:vectorSize"]??"1024");
+            string memoryStringConnection = _config["Qdrant:memoryUrl"] ?? "";
+            int VectorSize = int.Parse(_config["Qdrant:vectorSize"]??"1024");
             if (string.IsNullOrWhiteSpace(memoryStringConnection))
             {
                 _logger.LogError("Please set the connection string of the memory");
@@ -55,6 +55,7 @@ namespace Services.Service
             // For each memory found, get previous and next memories.
             await foreach (MemoryQueryResult r in queryResults)
             {
+                Console.WriteLine("query is done");
                 StringBuilder paraText=new StringBuilder();
                 int id = int.Parse(r.Metadata.Id);
                 MemoryQueryResult? rb2 = await textMemory.GetAsync(collenctionName, (id - 2).ToString());

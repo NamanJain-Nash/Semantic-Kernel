@@ -21,13 +21,10 @@ public class ChatLogic:IChatLogic
         //Getting Query With Memory
         string ragSystemMemory = await _searchService.SearchMemoriesAsync(chatInput.UserQuery,chatInput.CollectionName);
         Console.WriteLine("test:"+ragSystemMemory);
-        if (ragSystemMemory != "" && ragSystemMemory!="Keys not Found") {
-        chatQuery = $@"Question:{chatQuery}
-
-Context: {ragSystemMemory}
-";       
+        if (ragSystemMemory == "" || ragSystemMemory=="Keys not Found") {
+            ragSystemMemory="Use General Information Only";
         }
-        result.AiAnswer = await _chatService.ChattingWithLLM(chatQuery);
+        result.AiAnswer = await _chatService.ChattingWithLLM(chatQuery,ragSystemMemory);
         return result;
 
     }

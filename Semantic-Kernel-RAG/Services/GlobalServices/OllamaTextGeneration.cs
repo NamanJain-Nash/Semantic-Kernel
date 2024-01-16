@@ -35,7 +35,7 @@ public class OllamaTextGeneration : ITextGenerationService
     {
         // Doing the HTTP call to the Local LLM Server
         string LLMResultText;
-
+        Console.WriteLine(prompt);
         // Create an instance of the ChatRequest class
         var chatRequest = new GennerateOllamaRequest
         {
