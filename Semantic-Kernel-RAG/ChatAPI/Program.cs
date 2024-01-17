@@ -12,8 +12,7 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Add Services.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
@@ -47,6 +46,25 @@ app.MapGet("antiforgery/token", (IAntiforgery forgeryService, HttpContext contex
     var xsrfToken = tokens.RequestToken!;
     return TypedResults.Content(xsrfToken, "text/plain");
 });
+// File Embeddings Endpoint
+app.MapPost("api/file", async (IFormFileCollection files,string collection,DocumentHandler handler) => {
+    if (files == null)
+    {
+        return Results.BadRequest("Invalid input");
+    }
+    try
+    {
+        var result = await handler.DocumentToRag(files,collection);
+        return TypedResults.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception
+        return Results.BadRequest("Invalid input");
+    }
+});
+
+//Chatting Endpoint
 app.MapPost("/api/chat", async (ChatInput chatInput, ChatHandler chatHandler) =>
 {
     if (chatInput == null)
@@ -65,24 +83,6 @@ app.MapPost("/api/chat", async (ChatInput chatInput, ChatHandler chatHandler) =>
         return Results.BadRequest("Invalid input");
     }
 });
-app.MapPost("api/file", async (IFormFileCollection files,string collection,DocumentHandler handler) => {
-    if (files == null)
-    {
-        return Results.BadRequest("Invalid input");
-    }
-    try
-    {
-        var result = await handler.DocumentToRag(files,collection);
-        return TypedResults.Ok(result);
-    }
-    catch (Exception ex)
-    {
-        // Log the exception
-        return Results.BadRequest("Invalid input");
-    }
-});
-
-
 app.Run();
 
 
