@@ -1,4 +1,6 @@
-﻿using Services;
+﻿using Domain.Interfaces;
+using Microsoft.Extensions.Logging;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +12,36 @@ using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using Xceed.Words.NET;
 
-namespace Buisness_Logic
+namespace Domain
 {
     public class DocumentLogic : IDocumentLogic
     {
         private readonly ILoadMemoryService _loadMemoryService;
-        public DocumentLogic(ILoadMemoryService loadMemoryService) 
+        private readonly ILogger<DocumentLogic> _logger;
+
+        public DocumentLogic(ILoadMemoryService loadMemoryService, ILogger<DocumentLogic> logger)
         {
             _loadMemoryService = loadMemoryService;
+            _logger = logger;
         }
-        public async Task<bool> DocumentToEmbedding(string collection, params FileInfo[] textFile) {
-            try {
-                //Convert to Type
+
+        public async Task<bool> DocumentToEmbedding(string collection, params FileInfo[] textFiles)
+        {
+            try
+            {
+                // Convert to Type
                 var convertedFiles = new List<FileInfo>();
-                foreach (var file in textFile)
+                foreach (var textFile in textFiles)
                 {
-                    if (file.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
+                    if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
                     {
-                       convertedFiles.Add(file);
+                        convertedFiles.Add(textFile);
                     }
-                    else if (file.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
-                             file.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
+                    else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                             textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
                     {
                         // Convert PDF and DOCX to TXT and then import
-                        FileInfo textContent = ConvertToText(file);
+                        FileInfo textContent = ConvertToText(textFile);
 
                         if (textContent != null)
                         {
@@ -49,38 +57,44 @@ namespace Buisness_Logic
                         return false; // Unsupported file type
                     }
                 }
-                string result =await _loadMemoryService.ImportFile(collection, convertedFiles.ToArray());
+
+                string result = await _loadMemoryService.ImportFileAsync(collection, convertedFiles.ToArray());
 
                 if (result == "Import Done")
                 {
-
                     return true;
                 }
+
                 return false;
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during DocumentToEmbedding.");
                 return false;
             }
         }
+
         private FileInfo ConvertToText(FileInfo inputFile)
         {
             string resultText;
             try
             {
+                //Convert pdf
                 if (inputFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Convert PDF to text using PdfSharp
+                    // Convert PDF to text using PdfPig
                     using (PdfDocument pdfDocument = PdfDocument.Open(inputFile.FullName))
                     {
                         StringWriter textWriter = new StringWriter();
                         foreach (Page page in pdfDocument.GetPages())
                         {
-                            string text= ContentOrderTextExtractor.GetText(page);
+                            string text = ContentOrderTextExtractor.GetText(page);
                             textWriter.WriteLine(text);
                         }
-                        resultText= textWriter.ToString();
+                        resultText = textWriter.ToString();
                     }
                 }
+                //Convert docx
                 else if (inputFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
                 {
                     // Convert DOCX to text using DocX
@@ -96,21 +110,26 @@ namespace Buisness_Logic
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred during ConvertToText.");
                 return null;
             }
+
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploadsTemp");
             Directory.CreateDirectory(uploadsFolder);
+
             // Specify the file path
-            string filePath = Path.Combine(uploadsFolder, (inputFile.Name.Replace(".pdf", "").Replace(".docx", "")+".txt"));
+            string filePath = Path.Combine(uploadsFolder, $"{Path.GetFileNameWithoutExtension(inputFile.Name)}.txt");
+
             // Create a FileInfo object
             FileInfo fileInfo = new FileInfo(filePath);
+
             using (StreamWriter writer = fileInfo.CreateText())
             {
                 // Write the string to the file
                 writer.Write(resultText);
             }
-            return fileInfo;
 
+            return fileInfo;
         }
     }
 }
