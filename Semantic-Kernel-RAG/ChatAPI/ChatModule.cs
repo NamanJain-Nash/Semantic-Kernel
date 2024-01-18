@@ -1,4 +1,4 @@
-﻿using Buisness_Logic;
+﻿using Domain.Interfaces;
 using Models.Chat;
 
 namespace ChatAPI;

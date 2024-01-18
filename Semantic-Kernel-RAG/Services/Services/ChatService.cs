@@ -43,7 +43,7 @@ namespace Services.Service
             _logger = logger;
         }
         //To be implmented
-        public async Task<string> ChattingWithLLM(string query, string information)
+        public async Task<string> ChatWithLLMAsync(string query, string information)
         {
             //Intitalizing The Kernel
             IKernelBuilder builder = Kernel.CreateBuilder();

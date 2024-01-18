@@ -37,7 +37,7 @@ public class OllamaTextGeneration : ITextGenerationService
         string LLMResultText;
         Console.WriteLine(prompt);
         // Create an instance of the ChatRequest class
-        var chatRequest = new GennerateOllamaRequest
+        var chatRequest = new OllamaRequest
         {
             model = _model,
             temperature = _temprature,

@@ -1,5 +1,6 @@
 using Azure;
-using Buisness_Logic;
+using Domain;
+using Domain.Interfaces;
 using ChatAPI;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +20,7 @@ builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IChatLogic,ChatLogic>();
-builder.Services.AddSingleton<ISearchService,SearchService>();
+builder.Services.AddSingleton<ISearchService,SearchEmbeddingsService>();
 builder.Services.AddSingleton<IChatService,ChatService>();
 builder.Services.AddSingleton<IDocumentLogic,DocumentLogic>();
 builder.Services.AddSingleton<ILoadMemoryService,LoadMemoryService>();
@@ -60,7 +61,7 @@ app.MapPost("api/file", async (IFormFileCollection files,string collection,Docum
     catch (Exception ex)
     {
         // Log the exception
-        return Results.BadRequest("Invalid input");
+        return Results.BadRequest(ex.Message);
     }
 });
 

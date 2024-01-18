@@ -12,13 +12,13 @@ using Microsoft.SemanticKernel.Connectors.Qdrant;
 
 namespace Services.Service
 {
-    public class SearchService : ISearchService
+    public class SearchEmbeddingsService : ISearchService
     {
         private readonly IConfiguration _config;
         private readonly ILogger<LoadMemoryService> _logger;
         private readonly IKernelBuilder _kernel;
 
-        public SearchService(IConfiguration config, ILogger<LoadMemoryService> logger)
+        public SearchEmbeddingsService(IConfiguration config, ILogger<LoadMemoryService> logger)
         {
             _config = config;
             _logger = logger;
@@ -26,7 +26,7 @@ namespace Services.Service
         public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {
             //building the search engine for the store
-            testHuggingFace embeddingService = new testHuggingFace(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
+            CustomHuggingFaceTextEmbeddingService embeddingService = new CustomHuggingFaceTextEmbeddingService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
             string memoryStringConnection = _config["Qdrant:memoryUrl"] ?? "";
             int VectorSize = int.Parse(_config["Qdrant:vectorSize"]??"1024");
             if (string.IsNullOrWhiteSpace(memoryStringConnection))

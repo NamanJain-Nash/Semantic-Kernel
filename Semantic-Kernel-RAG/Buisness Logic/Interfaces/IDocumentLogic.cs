@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Buisness_Logic
+namespace Domain.Interfaces
 {
     public interface IDocumentLogic
     {
-        public Task<bool> DocumentToEmbedding(string collection,params FileInfo[] textFile);
-        }
+        public Task<bool> DocumentToEmbedding(string collection, params FileInfo[] textFile);
+    }
 }

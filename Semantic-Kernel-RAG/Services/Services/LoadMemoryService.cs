@@ -31,7 +31,7 @@ public class LoadMemoryService : ILoadMemoryService
         _config = config;
         _logger = logger;
     }
-    public async Task<string> ImportFile(string collection, params FileInfo[] textFile)
+    public async Task<string> ImportFileAsync(string collection, params FileInfo[] textFile)
     {
         // Validate arguments.
         if (textFile.Length == 0)
@@ -41,7 +41,7 @@ public class LoadMemoryService : ILoadMemoryService
         }
         //HuggingFaceTextEmbeddingGenerationService embeddiingService = new HuggingFaceTextEmbeddingGenerationService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
         //using custom sollution as package is not compatible with current json of the Hugging face api
-        testHuggingFace embeddiingService = new testHuggingFace(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
+        CustomHuggingFaceTextEmbeddingService embeddiingService = new CustomHuggingFaceTextEmbeddingService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
         string memoryStringConnection = _config["Quadrant:memoryUrl"] ?? "";
         if (string.IsNullOrWhiteSpace(memoryStringConnection))
         {

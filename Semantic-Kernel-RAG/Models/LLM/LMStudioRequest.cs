@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.LLM
 {
-    public class GennerateOllamaRequest
+    public class LMStudioRequest
     {
-    
-        public string model { get; set; }
+        public List<LMStudioMessage> messages { get; set; }
         public double temperature { get; set; }
-        public int num_predict { get; set; }
-        public string prompt { get; set; }
+        public int max_tokens { get; set; }
         public bool stream { get; set; }
     }
 }

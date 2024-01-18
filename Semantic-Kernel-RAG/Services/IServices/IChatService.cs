@@ -2,6 +2,6 @@
 {
     public interface IChatService
     {
-        public Task<string> ChattingWithLLM(string query,string information);
+        public Task<string> ChatWithLLMAsync(string query,string information);
     }
 }

@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Models.LLM
 {
-    public class LMStudioChatRequest
+    public class OllamaRequest
     {
-        public List<LMStudioMessage> messages { get; set; }
+    
+        public string model { get; set; }
         public double temperature { get; set; }
-        public int max_tokens { get; set; }
+        public int num_predict { get; set; }
+        public string prompt { get; set; }
         public bool stream { get; set; }
     }
 }

@@ -35,7 +35,7 @@ public sealed class LMStudioTextGenerationService : ITextGenerationService
     string LLMResultText;
 
     // Create an instance of the ChatRequest class
-    var chatRequest = new LMStudioChatRequest
+    var chatRequest = new LMStudioRequest
     {
         messages = new List<LMStudioMessage> { new LMStudioMessage { role = "user", content = prompt } },
         temperature = _temprature,
