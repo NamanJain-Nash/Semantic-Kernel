@@ -1,7 +1,7 @@
 using Azure;
 using Domain;
 using Domain.Interfaces;
-using ChatAPI;
+using API;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;

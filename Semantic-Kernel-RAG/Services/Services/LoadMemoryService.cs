@@ -42,13 +42,13 @@ public class LoadMemoryService : ILoadMemoryService
         //HuggingFaceTextEmbeddingGenerationService embeddiingService = new HuggingFaceTextEmbeddingGenerationService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
         //using custom sollution as package is not compatible with current json of the Hugging face api
         CustomHuggingFaceTextEmbeddingService embeddiingService = new CustomHuggingFaceTextEmbeddingService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
-        string memoryStringConnection = _config["Quadrant:memoryUrl"] ?? "";
+        string memoryStringConnection = _config["Qdrant:memoryUrl"] ?? "";
         if (string.IsNullOrWhiteSpace(memoryStringConnection))
         {
             _logger.LogError("Please set the connection string of the memory");
             return "Keys not Found";
         }
-        int vectorSize = int.Parse(_config["Quadrant:vectorSize"] ?? "1024");
+        int vectorSize = int.Parse(_config["Qdrant:vectorSize"] ?? "1024");
         var memoryStore = new QdrantMemoryStore(memoryStringConnection, vectorSize);
         //Savety to make the Collection
         try

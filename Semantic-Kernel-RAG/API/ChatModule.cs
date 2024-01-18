@@ -1,7 +1,7 @@
 ﻿using Domain.Interfaces;
 using Models.Chat;
 
-namespace ChatAPI;
+namespace API;
 
 public class ChatHandler
 {

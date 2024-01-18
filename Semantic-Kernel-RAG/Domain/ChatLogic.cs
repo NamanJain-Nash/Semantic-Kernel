@@ -35,7 +35,7 @@ public class ChatLogic : IChatLogic
         {
             // Getting Query With Memory
             string systemMemory = await _searchService.SearchMemoriesAsync(chatInput.UserQuery, chatInput.CollectionName);
-            _logger.LogError("test:" + systemMemory);
+            _logger.LogError("Memory : " + systemMemory);
 
             if (string.IsNullOrEmpty(systemMemory) || systemMemory == "Keys not Found")
             {

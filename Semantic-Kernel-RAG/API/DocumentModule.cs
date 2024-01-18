@@ -1,6 +1,6 @@
 ﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-namespace ChatAPI
+namespace API
 {
     public class DocumentHandler
     {
