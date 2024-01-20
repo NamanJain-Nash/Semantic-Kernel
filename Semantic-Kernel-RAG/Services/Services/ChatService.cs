@@ -67,8 +67,14 @@ namespace Services.Service
             var chatFunction = kernel.CreateFunctionFromPrompt(ChatTemplate);
             _logger.LogInformation($"Function input: {query}\n");
             //Run the Prompt
+            try{
             var result = await chatFunction.InvokeAsync(kernel, new() { ["query"] = query, ["information"] = information });
-            return result.ToString();
+            return result.ToString();}
+            catch(Exception e){
+                _logger.LogInformation("prompterror:  "+e.Message);
+                return e.Message;
+            }
+            
 
         }
     }

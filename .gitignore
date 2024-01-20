@@ -399,6 +399,8 @@ FodyWeavers.xsd
 Semantic-Kernel-RAG/data
 Semantic-Kernel-RAG/ollama
 Semantic-Kernel-RAG/Qdrant
+Semantic-Kernel-RAG/ChatApi/uploads
+Semantic-Kernel-RAG/ChatApi/uploadsTemp
 Semantic Kernel Local LLM/bin
 Semantic Kernel Local LLM/obj
 Semantic Kernel Local LLM/bin

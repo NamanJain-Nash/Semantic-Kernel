@@ -15,16 +15,18 @@ namespace Services.Service
     public class SearchEmbeddingsService : ISearchService
     {
         private readonly IConfiguration _config;
-        private readonly ILogger<LoadMemoryService> _logger;
+        private readonly ILogger<SearchEmbeddingsService> _logger;
         private readonly IKernelBuilder _kernel;
 
-        public SearchEmbeddingsService(IConfiguration config, ILogger<LoadMemoryService> logger)
+        public SearchEmbeddingsService(IConfiguration config, ILogger<SearchEmbeddingsService> logger)
         {
             _config = config;
             _logger = logger;
         }
         public async Task<string> SearchMemoriesAsync(string query, string collenctionName)
         {
+            try{
+                _logger.LogInformation("Search Done");
             //building the search engine for the store
             CustomHuggingFaceTextEmbeddingService embeddingService = new CustomHuggingFaceTextEmbeddingService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
             string memoryStringConnection = _config["Qdrant:memoryUrl"] ?? "";
@@ -38,7 +40,12 @@ namespace Services.Service
             SemanticTextMemory textMemory = new(
                 memoryStore,
                 embeddingService);
-            return await SearchInVectorAsync(textMemory, query, collenctionName);
+            return await SearchInVectorAsync(textMemory, query, collenctionName);}
+            catch(Exception e){
+
+                _logger.LogError(e.Message);
+                return e.Message;
+            }
         }
         private async Task<string> SearchInVectorAsync(SemanticTextMemory textMemory, string query, string collenctionName)
         {
@@ -51,11 +58,12 @@ namespace Services.Service
             //Building The Searched Result with Releveant Info.
             StringBuilder result = new StringBuilder();
             result.Append("[START INFO] \n ");
+            _logger.LogInformation("query is done");
             StringBuilder SummarizeText=new StringBuilder();
             // For each memory found, get previous and next memories.
             await foreach (MemoryQueryResult r in queryResults)
             {
-                Console.WriteLine("query is done");
+                _logger.LogInformation("query is done");
                 StringBuilder paraText=new StringBuilder();
                 int id = int.Parse(r.Metadata.Id);
                 MemoryQueryResult? rb2 = await textMemory.GetAsync(collenctionName, (id - 2).ToString());
