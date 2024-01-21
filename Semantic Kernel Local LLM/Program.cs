@@ -54,8 +54,7 @@ class Program
         var result =  await paragraphWritingFunction.InvokeAsync(kernel, new() { ["input"] = Input });
         Console.WriteLine("Ollama Response: "+result);}
         catch(Exception e){
-            Console.WriteLine(e.Message);}
-
+            Console.WriteLine(e.Message);
         
     }
     }

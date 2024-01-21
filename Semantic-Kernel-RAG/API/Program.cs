@@ -84,6 +84,23 @@ app.MapPost("/api/chat", async (ChatInput chatInput, ChatHandler chatHandler) =>
         return Results.BadRequest("Invalid input");
     }
 });
+//Pdf Summarizer
+app.MapPost("api/file/summarize", async (IFormFileCollection files,string name,DocumentHandler handler) => {
+    if (files == null)
+    {
+        return Results.BadRequest("Invalid input");
+    }
+    try
+    {
+        var result = await handler.DocumentToRag(files,collection);
+        return TypedResults.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception
+        return Results.BadRequest(ex.Message);
+    }
+});
 app.Run();
 
 
