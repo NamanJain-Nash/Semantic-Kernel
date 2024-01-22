@@ -24,7 +24,7 @@ namespace Services.Service
         public readonly double _temprature;
         public readonly int _maxtoken;
         public readonly string _model;
-        private string ChatTemplate = @"You are a chatting system that try to solve the Query and Information mentioned in a proffesional way and be precise in nature \r\n \r\n ```Query:{{$query}}  \r\n Information:{{$information}}```";
+        private string ChatTemplate = @"You are a Financial Analyst that try to solve the Query with the Information provided and general financial knowledge of stocks mentioned in a way that investor that is asking the question can understand it.  \r\n \r\n ```Query:{{$query}}  \r\n Information:{{$information}}```";
 
         public ChatService(IConfiguration config, ILogger<ChatService> logger)
         {
