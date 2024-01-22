@@ -42,7 +42,7 @@ Summary:";
             LLMSelector.SetupLLMParameters(config, _config["LLMUsed"] ?? "", out _apiUrl, out _maxtoken, out _temprature, out _model);
             _logger = logger;
         }
-        public async Task<string> SummarizeAsync(string fileName, params FileInfo[] textFile)
+        public async Task<string> SummarizeAsync(params FileInfo[] textFile)
         {
 
             //Define the Kernel for LLM and its Function

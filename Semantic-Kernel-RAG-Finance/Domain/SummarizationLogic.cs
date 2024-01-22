@@ -1,4 +1,5 @@
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using Services;
 using Services.IServices;
@@ -59,7 +60,21 @@ namespace Domain
                     }
                 }
 
-                string result = await _summaryService.SummarizeAsync(filename, convertedFiles.ToArray());
+                string result = await _summaryService.SummarizeAsync(convertedFiles.ToArray());
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "summarizedocs");
+                Directory.CreateDirectory(uploadsFolder);
+
+                // Specify the file path
+                string filePath = Path.Combine(uploadsFolder, $"{filename}.txt");
+
+                // Create a FileInfo object
+                FileInfo fileInfo = new FileInfo(filePath);
+
+                using (StreamWriter writer = fileInfo.CreateText())
+                {
+                    // Write the string to the file
+                    writer.Write(result);
+                }
                 return result;
             }
             catch (Exception ex)

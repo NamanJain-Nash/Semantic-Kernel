@@ -8,6 +8,6 @@ namespace Services.IServices
 {
     public interface ISumarizationLLMService
     {
-        public Task<string> SummarizeAsync(string fileName, params FileInfo[] textFile);
+        public Task<string> SummarizeAsync(params FileInfo[] textFile);
     }
 }
