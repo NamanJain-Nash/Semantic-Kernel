@@ -1,15 +1,15 @@
-﻿using Domain.Interfaces;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 namespace API.Modules
 {
-    public class DocumentHandler
+    public class SummarizationHandler
     {
-        private readonly IDocumentLogic _documentLogic;
-        public DocumentHandler(IDocumentLogic documentLogic)
+        private readonly ISummarizationLogic _summaryLogic;
+        public SummarizationHandler( ISummarizationLogic documentLogic)
         {
-            _documentLogic = documentLogic;
+            _summaryLogic = documentLogic;
         }
-        public async Task<string> DocumentToRag(IFormFileCollection files, string collection)
+        public async Task<string> DocumentToSummarization(IFormFileCollection files, string collection)
         {
             try
             {
@@ -44,12 +44,8 @@ namespace API.Modules
                     fileInfoArray.Add(fileInfo);
                 }
 
-                //Sending to Buisness Logic
-                if (await _documentLogic.DocumentToEmbedding(collection, fileInfoArray.ToArray()))
-                {
-                    return "Your Files have been Embedded";
-                }
-                return "File is Failed";
+                //Sending to Logic
+                return (await _summaryLogic.DocumentToSummary(collection, fileInfoArray.ToArray()));
             }
             catch (Exception e)
             {
@@ -58,3 +54,4 @@ namespace API.Modules
         }
     }
 }
+

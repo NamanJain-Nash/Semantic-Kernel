@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.TextGeneration;
 using Newtonsoft.Json;
 using Services.IService;
+using Services.Utils;
 
 namespace Services.Service
 {
@@ -28,18 +29,7 @@ namespace Services.Service
         public ChatService(IConfiguration config, ILogger<ChatService> logger)
         {
             _config = config;
-            if (_config["LLMUsed"] == "LMStudio")
-            {
-                _apiUrl = _config["LLM_LMStudio:endpoint"] ?? "";
-                _maxtoken = int.Parse(_config["LLM_LMStudio:maxtoken"] ?? "-1");
-                _temprature = double.Parse(_config["LLM_LMStudio:temprature"] ?? "0.1");
-            }
-            if(_config["LLMUsed"] == "Ollama"){
-                _apiUrl = _config["LLM_Ollama:endpoint"] ?? "";
-                _maxtoken = int.Parse(_config["LLM_Ollama:maxtoken"] ?? "-1");
-                _temprature = double.Parse(_config["LLM_Ollama:temprature"] ?? "0.1");
-                _model=_config["LLM_Ollama:model"]??"tinyllama";
-            }
+            LLMSelector.SetupLLMParameters(config, _config["LLMUsed"] ?? "", out _apiUrl, out _maxtoken, out _temprature, out _model);
             _logger = logger;
         }
         //To be implmented
@@ -51,30 +41,34 @@ namespace Services.Service
             if (_config["LLMUsed"] == "LMStudio")
             {
                 builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new LMStudioTextGenerationService(_apiUrl, _maxtoken, _temprature));
-            // Add your text generation service as a factory method
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new LMStudioTextGenerationService(_apiUrl, _maxtoken, _temprature));
+                // Add your text generation service as a factory method
+                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new LMStudioTextGenerationService(_apiUrl, _maxtoken, _temprature));
             }
-            if(_config["LLMUsed"] == "Ollama"){
-                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature,_model));
-            // Add your text generation service as a factory method
-            builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature,_model));
+            if (_config["LLMUsed"] == "Ollama")
+            {
+                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService1", new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature, _model));
+                // Add your text generation service as a factory method
+                builder.Services.AddKeyedSingleton<ITextGenerationService>("myService2", (_, _) => new OllamaTextGeneration(_apiUrl, _maxtoken, _temprature, _model));
             }
-            
-            
+
+
             //Build the Kernel
             Kernel kernel = builder.Build();
             //Function Defined
             var chatFunction = kernel.CreateFunctionFromPrompt(ChatTemplate);
             _logger.LogInformation($"Function input: {query}\n");
             //Run the Prompt
-            try{
-            var result = await chatFunction.InvokeAsync(kernel, new() { ["query"] = query, ["information"] = information });
-            return result.ToString();}
-            catch(Exception e){
-                _logger.LogInformation("prompterror:  "+e.Message);
+            try
+            {
+                var result = await chatFunction.InvokeAsync(kernel, new() { ["query"] = query, ["information"] = information });
+                return result.ToString();
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation("prompterror:  " + e.Message);
                 return e.Message;
             }
-            
+
 
         }
     }

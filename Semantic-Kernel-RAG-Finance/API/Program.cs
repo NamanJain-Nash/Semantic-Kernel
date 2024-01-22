@@ -1,7 +1,6 @@
 using Azure;
 using Domain;
 using Domain.Interfaces;
-using API;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Services;
 using Services.IService;
 using Services.Service;
 using System;
+using API.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +82,22 @@ app.MapPost("/api/chat", async (ChatInput chatInput, ChatHandler chatHandler) =>
     {
         // Log the exception
         return Results.BadRequest("Invalid input");
+    }
+});
+app.MapPost("api/summarize", async (IFormFileCollection files, string name, SummarizationHandler handler) => {
+    if (files == null)
+    {
+        return Results.BadRequest("Invalid input");
+    }
+    try
+    {
+        var result = await handler.DocumentToSummarization(files,name);
+        return TypedResults.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception
+        return Results.BadRequest(ex.Message);
     }
 });
 app.Run();
