@@ -42,7 +42,7 @@ Summary:";
             LLMSelector.SetupLLMParameters(config, _config["LLMUsed"] ?? "", out _apiUrl, out _maxtoken, out _temprature, out _model);
             _logger = logger;
         }
-        public async Task<string> SummarizeAsync(params FileInfo[] textFile)
+        public async Task<string> SummarizeAsync(FileInfo textFile)
         {
 
             //Define the Kernel for LLM and its Function
@@ -65,17 +65,12 @@ Summary:";
             //Function Defined
             var summarizationFunction = kernel.CreateFunctionFromPrompt(ChatTemplate);
 
-            // Import the text files.
-
-            int fileCount = 0;
 
             string summarizedText = "";
             //Load Into the Memory
-            foreach (FileInfo fileInfo in textFile)
-            {
-                fileCount++;
+            
                 // Read the text file.
-                string text = File.ReadAllText(fileInfo.FullName);
+                string text = File.ReadAllText(textFile.FullName);
                 // Split the text into sentences.
                 string[] sentences = BlingFireUtils.GetSentences(text).ToArray();
                 //Chunking the sentences to desired size
@@ -90,7 +85,7 @@ Summary:";
                     if (sentenceCount % 10 == 0)
                     {
                         // Log progress every 10 sentences.
-                        _logger.LogInformation($"[{fileCount}/{fileInfo.Length}] {fileInfo.FullName}: {sentenceCount}/{sentences.Length}");
+                        _logger.LogInformation($" {textFile.FullName}: {sentenceCount}/{sentences.Length}");
                     }
                     //LLM Call
                     try
@@ -103,8 +98,7 @@ Summary:";
                         var k = e.Message;
                     }
                 }
-                summarizedText += $"{fileCount}:" + pagetext + "\n";
-            }
+                summarizedText += pagetext + "\n";
             return summarizedText;
         }
         private static string[] ChunkingTheArray(string[] inputArray, int chunkSize)

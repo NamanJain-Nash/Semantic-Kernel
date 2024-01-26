@@ -1,4 +1,4 @@
-﻿namespace Services;
+﻿namespace Services.IService;
 
 public interface ILoadMemoryService
 {

@@ -2,14 +2,15 @@ using Azure;
 using Domain;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Models.Chat;
 using Services;
 using Services.IService;
 using Services.Service;
-using System;
 using API.Modules;
+using Buisness_Logic.Interfaces;
+using Buisness_Logic;
+using Services.Services;
+using Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +20,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+//Loggics
 builder.Services.AddSingleton<IChatLogic,ChatLogic>();
-builder.Services.AddSingleton<ISearchService,SearchEmbeddingsService>();
-builder.Services.AddSingleton<IChatService,ChatService>();
 builder.Services.AddSingleton<IDocumentLogic,DocumentLogic>();
+builder.Services.AddSingleton<ISummarizationLogic,SummarizationLogic>();
+builder.Services.AddSingleton<ISummarizationBasedEmbeddingLogic,SummarizationBasedEmbeddingLogic>();
+//Services
+builder.Services.AddSingleton<ISearchService, SearchEmbeddingsService>();
+builder.Services.AddSingleton<IChatService, ChatService>();
 builder.Services.AddSingleton<ILoadMemoryService,LoadMemoryService>();
+builder.Services.AddSingleton<ISumarizationLLMService, SumarizationLLMService>();
+//Modules
 builder.Services.AddTransient<DocumentHandler>();
 builder.Services.AddTransient<ChatHandler>();
+builder.Services.AddTransient<SummarizationHandler>();
+builder.Services.AddTransient<SummarizationBasedEmbeddingHandler>();
 
 
 var app = builder.Build();
@@ -92,6 +101,23 @@ app.MapPost("api/summarize", async (IFormFileCollection files, string name, Summ
     try
     {
         var result = await handler.DocumentToSummarization(files,name);
+        return TypedResults.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception
+        return Results.BadRequest(ex.Message);
+    }
+});
+// File Embeddings Endpoint with summarization
+app.MapPost("api/summarization/file", async (IFormFileCollection files, string collection, SummarizationBasedEmbeddingHandler handler) => {
+    if (files == null)
+    {
+        return Results.BadRequest("Invalid input");
+    }
+    try
+    {
+        var result = await handler.DocumentToRag(files, collection);
         return TypedResults.Ok(result);
     }
     catch (Exception ex)

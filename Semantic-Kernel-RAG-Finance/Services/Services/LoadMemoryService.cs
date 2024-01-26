@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Microsoft.SemanticKernel.Services;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using Services.IService;
 namespace Services;
 
 public class LoadMemoryService : ILoadMemoryService
