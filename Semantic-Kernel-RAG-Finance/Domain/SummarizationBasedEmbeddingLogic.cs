@@ -44,57 +44,55 @@ namespace Buisness_Logic
         {
             try
             {
-                // Convert to Type
-                var convertedFiles = new List<FileInfo>();
-                Parallel.ForEach(textFiles, textFile =>
-        {
-            if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
-            {
-                convertedFiles.Add(textFile);
-            }
-            else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
-                     textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-            {
-                FileInfo textContent = Filecoverter.ConvertToText(textFile, _logger);
+                var convertedFiles = await Task.WhenAll(textFiles.Select(async textFile =>
+                {
+                    if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return textFile;
+                    }
+                    else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                             textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        FileInfo textContent =  Filecoverter.ConvertToText(textFile, _logger);
 
-                if (textContent != null)
-                {
-                    convertedFiles.Add(textContent);
-                }
-                else
-                {
-                    // Handle conversion failure
-                    throw new InvalidOperationException("Conversion failed for file: " + textFile.FullName);
-                }
-            }
-            else
-            {
-                // Handle unsupported file type
-                throw new NotSupportedException("Unsupported file type: " + textFile.Extension);
-            }
-        });
-                //Summarize and modify
-                foreach (var convertedFile in convertedFiles)
+                        if (textContent != null)
+                        {
+                            return textContent;
+                        }
+                        else
+                        {
+                            // Handle conversion failure
+                            throw new InvalidOperationException("Conversion failed for file: " + textFile.FullName);
+                        }
+                    }
+                    else
+                    {
+                        // Handle unsupported file type
+                        throw new NotSupportedException("Unsupported file type: " + textFile.Extension);
+                    }
+                }));
+
+                var importResults = await Task.WhenAll(convertedFiles.Select(async convertedFile =>
                 {
                     string summarieseData = await _summaryService.SummarizeAsync(convertedFile);
                     string filePath = convertedFile.FullName;
+
+                    // Use async methods for file operations
                     if (File.Exists(filePath))
                     {
-                        // Clear the existing content of the file
-                        File.WriteAllText(filePath, string.Empty);
-
-                        // Write the new content to the file
-                        File.WriteAllText(filePath, summarieseData);
+                        await File.WriteAllTextAsync(filePath, string.Empty);
+                        await File.WriteAllTextAsync(filePath, summarieseData);
                     }
-                }
-                string result = await _loadMemoryService.ImportFileAsync(collection, convertedFiles.ToArray());
 
-                if (result == "Import Done")
+                    return await _loadMemoryService.ImportFileAsync(collection, convertedFile);
+                }));
+
+                // Check if at least one import operation was successful
+                if (importResults.Any(result => result != "Import Done"))
                 {
-                    return true;
+                    return false;
                 }
-
-                return false;
+                return true;
             }
             catch (Exception ex)
             {
@@ -103,4 +101,5 @@ namespace Buisness_Logic
             }
         }
     }
+
 }

@@ -5,6 +5,7 @@ using Services;
 using Services.IService;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
@@ -31,43 +32,45 @@ namespace Domain
         {
             try
             {
-                // Convert to Type
-                var convertedFiles = new List<FileInfo>();
-                foreach (var textFile in textFiles)
-                {
-                    if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
+                // Filter supported files and convert asynchronously
+                var convertedFiles = await Task.WhenAll(textFiles
+                    .AsParallel()
+                    .Select(async textFile =>
                     {
-                        convertedFiles.Add(textFile);
-                    }
-                    else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
-                             textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Convert PDF and DOCX to TXT and then import
-                        FileInfo textContent = Filecoverter.ConvertToText(textFile, _logger);
-
-                        if (textContent != null)
+                        if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
                         {
-                            convertedFiles.Add(textContent);
+                            return textFile;
+                        }
+                        else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                                 textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Convert PDF and DOCX to TXT asynchronously
+                            return await Task.Run(() => Filecoverter.ConvertToText(textFile, _logger));
                         }
                         else
                         {
-                            return false; // Conversion failed
+                            return null; // Unsupported file type
                         }
-                    }
-                    else
-                    {
-                        return false; // Unsupported file type
-                    }
-                }
+                    }));
 
-                string result = await _loadMemoryService.ImportFileAsync(collection, convertedFiles.ToArray());
+                // Filter out null results (unsupported files)
+                convertedFiles = convertedFiles.Where(file => file != null).ToArray();
+                // Import files in parallel
+                var importTasks = convertedFiles.Select(convertedFile =>
+                    _loadMemoryService.ImportFileAsync(collection, convertedFile));
 
-                if (result == "Import Done")
+                // Wait for all import tasks to complete
+                string[] importResults = await Task.WhenAll(importTasks);
+
+                // Check import results
+                if (importResults.All(result => result == "Import Done"))
                 {
                     return true;
                 }
-
-                return false;
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
