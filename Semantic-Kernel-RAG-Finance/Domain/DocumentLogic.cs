@@ -56,14 +56,10 @@ namespace Domain
                 // Filter out null results (unsupported files)
                 convertedFiles = convertedFiles.Where(file => file != null).ToArray();
                 // Import files in parallel
-                var importTasks = convertedFiles.Select(convertedFile =>
-                    _loadMemoryService.ImportFileAsync(collection, convertedFile));
-
-                // Wait for all import tasks to complete
-                string[] importResults = await Task.WhenAll(importTasks);
+                var result = await  _loadMemoryService.ImportFileAsync(collection,convertedFiles);
 
                 // Check import results
-                if (importResults.All(result => result == "Import Done"))
+                if (result == "Import Done")
                 {
                     return true;
                 }

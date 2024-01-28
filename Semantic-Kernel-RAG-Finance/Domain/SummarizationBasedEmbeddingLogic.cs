@@ -48,15 +48,33 @@ namespace Buisness_Logic
                 {
                     if (textFile.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
                     {
+                        string summarieseData = await _summaryService.SummarizeAsync(textFile);
+                        string filePath = textFile.FullName;
+
+                        // Use async methods for file operations
+                        if (File.Exists(filePath))
+                        {
+                            await File.WriteAllTextAsync(filePath, string.Empty);
+                            await File.WriteAllTextAsync(filePath, summarieseData);
+                        }
                         return textFile;
                     }
                     else if (textFile.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
                              textFile.Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
                     {
-                        FileInfo textContent =  Filecoverter.ConvertToText(textFile, _logger);
+                        FileInfo textContent = Filecoverter.ConvertToText(textFile, _logger);
 
                         if (textContent != null)
                         {
+                            string summarieseData = await _summaryService.SummarizeAsync(textContent);
+                            string filePath = textContent.FullName;
+
+                            // Use async methods for file operations
+                            if (File.Exists(filePath))
+                            {
+                                await File.WriteAllTextAsync(filePath, string.Empty);
+                                await File.WriteAllTextAsync(filePath, summarieseData);
+                            }
                             return textContent;
                         }
                         else
@@ -71,24 +89,11 @@ namespace Buisness_Logic
                         throw new NotSupportedException("Unsupported file type: " + textFile.Extension);
                     }
                 }));
-
-                var importResults = await Task.WhenAll(convertedFiles.Select(async convertedFile =>
-                {
-                    string summarieseData = await _summaryService.SummarizeAsync(convertedFile);
-                    string filePath = convertedFile.FullName;
-
-                    // Use async methods for file operations
-                    if (File.Exists(filePath))
-                    {
-                        await File.WriteAllTextAsync(filePath, string.Empty);
-                        await File.WriteAllTextAsync(filePath, summarieseData);
-                    }
-
-                    return await _loadMemoryService.ImportFileAsync(collection, convertedFile);
-                }));
+                var result =
+await _loadMemoryService.ImportFileAsync(collection, convertedFiles);
 
                 // Check if at least one import operation was successful
-                if (importResults.Any(result => result != "Import Done"))
+                if (result != "Import Done")
                 {
                     return false;
                 }

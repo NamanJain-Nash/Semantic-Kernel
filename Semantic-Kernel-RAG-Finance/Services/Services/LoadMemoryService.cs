@@ -32,7 +32,7 @@ public class LoadMemoryService : ILoadMemoryService
         _config = config;
         _logger = logger;
     }
-    public async Task<string> ImportFileAsync(string collection, FileInfo textFile)
+    public async Task<string> ImportFileAsync(string collection, params FileInfo[] textFile)
     {
         // Validate arguments.
         if (textFile.Length == 0)
@@ -76,10 +76,15 @@ public class LoadMemoryService : ILoadMemoryService
 
         return "Import Done";
     }
-    private async Task ImportMemoriesAsync(SemanticTextMemory kernel, string collection, FileInfo textFile)
+    private async Task ImportMemoriesAsync(SemanticTextMemory kernel, string collection, params FileInfo[] textFile)
     {
+        // Import the text files.
+        int fileCount = 0;
+        //Load Into the Memory
+        foreach (FileInfo fileInfo in textFile)
+        {
             // Read the text file.
-            string text = File.ReadAllText(textFile.FullName);
+            string text = File.ReadAllText(fileInfo.FullName);
             // Split the text into sentences.
             // Split the text into sentences.
             string[] sentences = BlingFireUtils.GetSentences(text).ToArray();
@@ -92,7 +97,7 @@ public class LoadMemoryService : ILoadMemoryService
                 if (sentenceCount % 10 == 0)
                 {
                     // Log progress every 10 sentences.
-                    _logger.LogInformation($"{textFile.FullName}: {sentenceCount}/{sentences.Length}");
+                    _logger.LogInformation($"[{fileCount}/{fileInfo.Length}] {fileInfo.FullName}: {sentenceCount}/{sentences.Length}");
                 }
 
                 try
@@ -103,9 +108,11 @@ public class LoadMemoryService : ILoadMemoryService
                 }
                 catch (Exception e)
                 {
-                    var k=e.Message;
+                    var k = e.Message;
                 }
             }
+
+        }
     }
     //public async Task<string> testKernelMmeory() {
     //    HuggingFaceTextEmbeddingGenerationService embeddiingService = new HuggingFaceTextEmbeddingGenerationService(_config["Embedding:ModelName"], _config["Embedding:Endopint"]);
