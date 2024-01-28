@@ -29,7 +29,7 @@ namespace Services.Services
         public readonly string _model;
         public readonly string _typeoftext;
         public readonly int _chunksize;
-        private string ChatTemplate = @"You are a Summarization system that Summarize the text in Input for {{$type}} of data to minimum no of words as possible while keeping the all the key details.
+        private string ChatTemplate = @"You are a Summarization system that Summarize the text in the Input and that text is chaving chuncks of a {{$type}} report transcript to minimum no of words as possible while keeping the all the key details and try to avoid names.
 
 ```Input:{{$summarizetext}}```
 Summary:";
@@ -90,7 +90,8 @@ Summary:";
                     //LLM Call
                     try
                     {
-                        var result = await summarizationFunction.InvokeAsync(kernel, new() { ["input"] = sentence, ["type"] = _typeoftext });
+                        var result = await summarizationFunction.InvokeAsync(kernel, new() { ["summarizetext"] = sentence, ["type"] = _typeoftext });
+                        _logger.LogInformation(sentence);
                         pagetext += result.ToString();
                     }
                     catch (Exception e)
