@@ -2,7 +2,7 @@
 <p>This project is an API-based RAG system designed to facilitate communication with text-based PDFs, Word documents, and text files. It leverages Language Model (LLMs) and Embeddings that run locally, ensuring user privacy and control.</p>
 
 ## Architecture
-
+<img src="https://github.com/NamanJain-Nash/Semantic-Kernel/blob/Development/Semantic-Kernel-RAG/Images/Architecture.png" alt="Architecture"/>
 
 ## Requirements
 <p>All Open Sourced LLMs , Vector DB , Models and Tools are Genereally prefered and have used Docker Compose that will start the application to easily</p>
